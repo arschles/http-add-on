@@ -31,5 +31,5 @@ RUN cargo build --release --bin operator
 FROM rust as runtime
 
 WORKDIR /app
-COPY --from=builder /app/target/release/app /usr/local/bin
-ENTRYPOINT ["./usr/local/bin/app"]
+COPY --from=builder /app/target/release/operator /usr/local/bin
+ENTRYPOINT ["/usr/local/bin/operator"]

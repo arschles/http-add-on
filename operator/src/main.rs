@@ -1,6 +1,6 @@
 
-#[macro_use] extern crate serde_derive;
 #[macro_use] extern crate log;
+// #[macro_use] extern crate serde_derive;
 
 use kube::{
     api::{ListParams},
@@ -8,7 +8,7 @@ use kube::{
     Client,
     Api,
 };
-use kube_derive::CustomResource;
+// https://docs.rs/kube-runtime/0.43.0/kube_runtime/controller/struct.Controller.html
 use kube_runtime::controller::{Context, Controller, ReconcilerAction};
 use k8s_openapi::{
     api::apps::v1::Deployment
@@ -17,18 +17,10 @@ use k8s_openapi::{
 use snafu::{Backtrace, /*OptionExt, ResultExt,*/ Snafu};
 
 use tokio::time::Duration;
+use operator::crds::{App, create_crd};
+
 use futures::StreamExt;
 
-
-
-
-#[derive(CustomResource, Serialize, Deserialize, Clone, Debug)]
-#[kube(group = "keda.sh", version = "v1", kind = "App", namespaced)]
-pub struct AppSpec {
-    pub name: String,
-    pub image: String,
-    pub port: u32,
-}
 
 // This is a convenience alias that describes the object we get from Kubernetes
 // type KubeApp = Object<App, ()>;
@@ -65,6 +57,8 @@ async fn main() -> Result<(), kube::Error>{
     // Set a namespace. We're just hard-coding for now.
     let namespace = "default";
 
+    create_crd(&client, namespace.into()).await?;
+
     let default_list_params = ListParams::default();
 
     let app_api: Api<App> = Api::namespaced(client.clone(), namespace);
@@ -83,6 +77,9 @@ async fn main() -> Result<(), kube::Error>{
         }
     })
     .await;
+
+    // We might need to start other reconcilers for the other resources that an app
+    // "owns" - not sure how that works
     
 
     // let newApp = App::new("myapp", AppSpec{
@@ -122,7 +119,8 @@ fn error_policy(_error: &Error, _ctx: Context<Data>) -> ReconcilerAction {
 }
 
 
-async fn reconcile(_: App, _: Context<Data>) -> Result<ReconcilerAction, Error> {
+async fn reconcile(app: App, _: Context<Data>) -> Result<ReconcilerAction, Error> {
+    println!("Reconciling app {:?}", app);
 
     // TODO: implement!
 

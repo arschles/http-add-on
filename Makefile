@@ -25,4 +25,20 @@ build-operator:
 
 .PHONY: docker-build-operator
 docker-build-operator:
-	docker build -t arschles/operator -f operator/Dockerfile operator
+	docker build -t arschles/keda-http-operator -f operator/Dockerfile operator
+
+.PHONY: docker-push-operator
+docker-push-operator:
+	docker push arschles/keda-http-operator
+
+.PHONY: helm-operator
+helm-operator:
+	helm upgrade \
+		--set image.tag=latest \
+		--set image.pullPolicy=Always \
+		--set image.repository=arschles/keda-http-operator \
+		--create-namespace \
+		--install \
+		--namespace \
+		keda-http keda-http-operator ./operator/chart
+
