@@ -1,9 +1,8 @@
 use kube::{
     api::{PatchParams, PatchStrategy},
-    // api::Object,
-    Client,
     Api,
     Error,
+    Client,
 };
 
 use serde::{Serialize, Deserialize};
@@ -21,7 +20,7 @@ pub struct AppSpec {
 }
 
 
-pub async fn create_crd(client: &kube::Client, _ns: String) -> Result<CustomResourceDefinition, Error> {
+pub async fn create_crd(client: &Client, _ns: String) -> Result<CustomResourceDefinition, Error> {
     // let static_ns: &str = &ns;
     // let apps: Api<App> = Api::namespaced(client.clone(), static_ns);
    
