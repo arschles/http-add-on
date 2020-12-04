@@ -10,9 +10,8 @@ use k8s_openapi::apiextensions_apiserver::pkg::apis::apiextensions::v1::{CustomR
 use kube_derive::{CustomResource};
 
 
-
 #[derive(CustomResource, Serialize, Deserialize, Clone, Debug)]
-#[kube(group = "keda.sh", version = "v1", kind = "App", namespaced)]
+#[kube(group = "keda.sh", version = "v1", kind = "ScaledHTTPApp", namespaced)]
 pub struct AppSpec {
     pub name: String,
     pub image: String,
@@ -32,7 +31,7 @@ pub async fn create_crd(client: &Client, _ns: String) -> Result<CustomResourceDe
         force: false,
         field_manager: Some("keda-http-operator".into()),
     };
-    let yaml = serde_yaml::to_vec(&App::crd()).map_err(|err| {
+    let yaml = serde_yaml::to_vec(&ScaledHTTPApp::crd()).map_err(|err| {
         Error::DynamicResource(format!("Serde error converting app to YAML ({:?})", err))
     })?;
     crds.patch("scaledhttpapps.keda.sh", &patch_params, yaml).await

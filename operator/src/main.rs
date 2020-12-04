@@ -17,7 +17,7 @@ use k8s_openapi::{
 use snafu::{Backtrace, /*OptionExt, ResultExt,*/ Snafu};
 
 use tokio::time::Duration;
-use operator::crds::{App, create_crd};
+use operator::crds::{ScaledHTTPApp, create_crd};
 
 use futures::StreamExt;
 
@@ -52,16 +52,24 @@ struct Data {
 
 #[tokio::main]
 async fn main() -> Result<(), kube::Error>{
+    println!("Starting up");
     let client = Client::try_default().await?;
 
     // Set a namespace. We're just hard-coding for now.
+    // TODO: make this settable via an env var
     let namespace = "default";
 
-    create_crd(&client, namespace.into()).await?;
+    create_crd(&client, namespace.into()).await.map(|c| {
+        println!("CRD Created");
+        c
+    }).map_err(|e| {
+        println!("Failed creating CRD {:?}", e);
+        e
+    })?;
 
     let default_list_params = ListParams::default();
 
-    let app_api: Api<App> = Api::namespaced(client.clone(), namespace);
+    let app_api: Api<ScaledHTTPApp> = Api::namespaced(client.clone(), namespace);
     let deployments_api: Api<Deployment> = Api::namespaced(client.clone(), namespace);
 
     let context = Context::new(Data{client});
@@ -83,7 +91,8 @@ async fn main() -> Result<(), kube::Error>{
     
 
     // let newApp = App::new("myapp", AppSpec{
-    //     name: String::from("MyNewApp"),
+    // 
+    // name: String::from("MyNewApp"),
     //     image: String::from("arschles/xkcd"),
     //     port: 1234,
     // });
@@ -119,7 +128,7 @@ fn error_policy(_error: &Error, _ctx: Context<Data>) -> ReconcilerAction {
 }
 
 
-async fn reconcile(app: App, _: Context<Data>) -> Result<ReconcilerAction, Error> {
+async fn reconcile(app: ScaledHTTPApp, _: Context<Data>) -> Result<ReconcilerAction, Error> {
     println!("Reconciling app {:?}", app);
 
     // TODO: implement!

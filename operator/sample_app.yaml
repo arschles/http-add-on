@@ -1,0 +1,8 @@
+apiVersion: keda.sh/v1
+kind: ScaledHTTPApp 
+metadata:
+  name: testapp
+spec:
+  name: mytestapp
+  image: arschles/xkcd
+  port: 8080
