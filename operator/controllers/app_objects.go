@@ -8,19 +8,19 @@ import (
 	ctrl "sigs.k8s.io/controller-runtime"
 )
 
-func (r *ScaledObjectReconciler) removeAppObjects(
+func (r *HTTPScaledObjectReconciler) removeAppObjects(
 	logger logr.Logger,
 	req ctrl.Request,
-	so *v1alpha1.ScaledObject,
+	so *v1alpha1.HTTPScaledObject,
 ) error {
 	// TODO
 	return nil
 }
 
-func (r *ScaledObjectReconciler) addAppObjects(
+func (r *HTTPScaledObjectReconciler) addAppObjects(
 	logger logr.Logger,
 	req ctrl.Request,
-	so *v1alpha1.ScaledObject,
+	so *v1alpha1.HTTPScaledObject,
 ) error {
 	logger = r.Log.WithValues()
 	appName := so.Spec.AppName

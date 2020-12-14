@@ -23,8 +23,8 @@ import (
 // EDIT THIS FILE!  THIS IS SCAFFOLDING FOR YOU TO OWN!
 // NOTE: json tags are required.  Any new fields you add must have json tags for the fields to be serialized.
 
-// ScaledObjectSpec defines the desired state of ScaledObject
-type ScaledObjectSpec struct {
+// HTTPScaledObjectSpec defines the desired state of HTTPScaledObject
+type HTTPScaledObjectSpec struct {
 	// INSERT ADDITIONAL SPEC FIELDS - desired state of cluster
 	// Important: Run "make" to regenerate code after modifying this file
 
@@ -33,32 +33,32 @@ type ScaledObjectSpec struct {
 	Port    int32  `json:"port"`
 }
 
-// ScaledObjectStatus defines the observed state of ScaledObject
-type ScaledObjectStatus struct {
+// HTTPScaledObjectStatus defines the observed state of HTTPScaledObject
+type HTTPScaledObjectStatus struct {
 	// INSERT ADDITIONAL STATUS FIELD - define observed state of cluster
 	// Important: Run "make" to regenerate code after modifying this file
 }
 
 // +kubebuilder:object:root=true
 
-// ScaledObject is the Schema for the scaledobjects API
-type ScaledObject struct {
+// HTTPScaledObject is the Schema for the scaledobjects API
+type HTTPScaledObject struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`
 
-	Spec   ScaledObjectSpec   `json:"spec,omitempty"`
-	Status ScaledObjectStatus `json:"status,omitempty"`
+	Spec   HTTPScaledObjectSpec   `json:"spec,omitempty"`
+	Status HTTPScaledObjectStatus `json:"status,omitempty"`
 }
 
 // +kubebuilder:object:root=true
 
-// ScaledObjectList contains a list of ScaledObject
-type ScaledObjectList struct {
+// HTTPScaledObjectList contains a list of HTTPScaledObject
+type HTTPScaledObjectList struct {
 	metav1.TypeMeta `json:",inline"`
 	metav1.ListMeta `json:"metadata,omitempty"`
-	Items           []ScaledObject `json:"items"`
+	Items           []HTTPScaledObject `json:"items"`
 }
 
 func init() {
-	SchemeBuilder.Register(&ScaledObject{}, &ScaledObjectList{})
+	SchemeBuilder.Register(&HTTPScaledObject{}, &HTTPScaledObjectList{})
 }

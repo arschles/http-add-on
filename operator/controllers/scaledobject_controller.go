@@ -31,8 +31,8 @@ import (
 	httpv1alpha1 "github.com/kedacore/http-add-on/operator/api/v1alpha1"
 )
 
-// ScaledObjectReconciler reconciles a ScaledObject object
-type ScaledObjectReconciler struct {
+// HTTPScaledObjectReconciler reconciles a HTTPScaledObject object
+type HTTPScaledObjectReconciler struct {
 	K8sCl                 *kubernetes.Clientset
 	K8sDynamicCl          dynamic.Interface
 	ExternalScalerAddress string
@@ -45,19 +45,19 @@ type ScaledObjectReconciler struct {
 // +kubebuilder:rbac:groups=http.keda.sh,resources=scaledobjects/status,verbs=get;update;patch
 
 // Reconcile reconciles a newly created, deleted, or otherwise changed
-// ScaledObject
-func (r *ScaledObjectReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
-	logger := r.Log.WithValues("ScaledObject.Namespace", req.Namespace, "ScaledObject.Name", req.Name)
+// HTTPScaledObject
+func (r *HTTPScaledObjectReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
+	logger := r.Log.WithValues("HTTPScaledObject.Namespace", req.Namespace, "HTTPScaledObject.Name", req.Name)
 
 	ctx := context.Background()
 	_ = r.Log.WithValues("scaledobject", req.NamespacedName)
-	so := &httpv1alpha1.ScaledObject{}
+	so := &httpv1alpha1.HTTPScaledObject{}
 	if err := r.Client.Get(ctx, client.ObjectKey{
 		Name:      req.Name,
 		Namespace: req.Namespace,
 	}, so); err != nil {
 		if errors.IsNotFound(err) {
-			// If the ScaledObject wasn't found, it might have
+			// If the HTTPScaledObject wasn't found, it might have
 			// been deleted between the reconcile and the get.
 			// It'll automatically get garbage collected, so don't
 			// schedule a requeue
@@ -101,8 +101,8 @@ func (r *ScaledObjectReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error
 }
 
 // SetupWithManager starts up reconciliation with the given manager
-func (r *ScaledObjectReconciler) SetupWithManager(mgr ctrl.Manager) error {
+func (r *HTTPScaledObjectReconciler) SetupWithManager(mgr ctrl.Manager) error {
 	return ctrl.NewControllerManagedBy(mgr).
-		For(&httpv1alpha1.ScaledObject{}).
+		For(&httpv1alpha1.HTTPScaledObject{}).
 		Complete(r)
 }
