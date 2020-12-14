@@ -90,8 +90,11 @@ func (rec *HTTPScaledObjectReconciler) Reconcile(req ctrl.Request) (ctrl.Result,
 
 	if err := rec.addAppObjects(logger, req, httpso); err != nil {
 		logger.Error(err, "Adding app objects")
-
+		if removeErr := rec.removeAppObjects(logger, req, httpso); removeErr != nil {
+			logger.Error(removeErr, "Removing previously created resources")
+		}
 		return ctrl.Result{}, err
+	}
 
 	var pollingInterval int32 = 50000
 	if httpso.Spec.PollingInterval != 0 {
