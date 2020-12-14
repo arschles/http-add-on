@@ -36,14 +36,11 @@ const (
 	Unknown HTTPScaledObjectCreationStatus = "Unknown"
 )
 
-// EDIT THIS FILE!  THIS IS SCAFFOLDING FOR YOU TO OWN!
 // NOTE: json tags are required.  Any new fields you add must have json tags for the fields to be serialized.
+// Important: Run "make" to regenerate code after modifying this file
 
 // HTTPScaledObjectSpec defines the desired state of HTTPScaledObject
 type HTTPScaledObjectSpec struct {
-	// INSERT ADDITIONAL SPEC FIELDS - desired state of cluster
-	// Important: Run "make" to regenerate code after modifying this file
-
 	AppName string `json:"app_name,omitempty"`
 	Image   string `json:"container"`
 	Port    int32  `json:"port"`
@@ -51,8 +48,6 @@ type HTTPScaledObjectSpec struct {
 
 // HTTPScaledObjectStatus defines the observed state of HTTPScaledObject
 type HTTPScaledObjectStatus struct {
-	// INSERT ADDITIONAL STATUS FIELD - define observed state of cluster
-	// Important: Run "make" to regenerate code after modifying this file
 	ServiceStatus    HTTPScaledObjectCreationStatus `json:"service_status,omitempty"`
 	IngressStatus    HTTPScaledObjectCreationStatus `json:"ingress_status,omitempty"`
 	DeploymentStatus HTTPScaledObjectCreationStatus `json:"deployment_status,omitempty"`
