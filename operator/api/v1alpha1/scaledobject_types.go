@@ -20,6 +20,22 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
+// HTTPScaledObjectCreationStatus describes the creation status
+// of the scaler's additional resources such as Services, Ingresses and Deployments
+// +kubebuilder:validation:Enum=Created;Error;Pending;Unknown
+type HTTPScaledObjectCreationStatus string
+
+const (
+	// Created indicates the resource has been created
+	Created HTTPScaledObjectCreationStatus = "Created"
+	// Error indicates the resource had an error
+	Error HTTPScaledObjectCreationStatus = "Error"
+	// Pending indicates the resource hasn't been created
+	Pending HTTPScaledObjectCreationStatus = "Pending"
+	// Unknown indicates the status is unavailable
+	Unknown HTTPScaledObjectCreationStatus = "Unknown"
+)
+
 // EDIT THIS FILE!  THIS IS SCAFFOLDING FOR YOU TO OWN!
 // NOTE: json tags are required.  Any new fields you add must have json tags for the fields to be serialized.
 
@@ -37,6 +53,10 @@ type HTTPScaledObjectSpec struct {
 type HTTPScaledObjectStatus struct {
 	// INSERT ADDITIONAL STATUS FIELD - define observed state of cluster
 	// Important: Run "make" to regenerate code after modifying this file
+	ServiceStatus    HTTPScaledObjectCreationStatus `json:"service_status,omitempty"`
+	IngressStatus    HTTPScaledObjectCreationStatus `json:"ingress_status,omitempty"`
+	DeploymentStatus HTTPScaledObjectCreationStatus `json:"deployment_status,omitempty"`
+	Ready            bool                           `json:"ready,omitempty"`
 }
 
 // +kubebuilder:object:root=true
