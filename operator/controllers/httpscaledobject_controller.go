@@ -86,6 +86,12 @@ func (rec *HTTPScaledObjectReconciler) Reconcile(req ctrl.Request) (ctrl.Result,
 	appName := httpso.Spec.AppName
 	image := httpso.Spec.Image
 	port := httpso.Spec.Port
+	httpso.Status = httpv1alpha1.HTTPScaledObjectStatus{
+		ServiceStatus: httpv1alpha1.Unknown,
+		DeploymentStatus: httpv1alpha1.Unknown,
+		ScaledObjectStatus: httpv1alpha1.Unknown,
+		Ready: false,
+	}
 	logger.Info("App Name: %s, image: %s, port: %d", appName, image, port)
 
 	if err := rec.addAppObjects(logger, req, httpso); err != nil {
