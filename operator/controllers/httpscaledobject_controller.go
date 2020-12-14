@@ -46,16 +46,17 @@ type HTTPScaledObjectReconciler struct {
 
 // Reconcile reconciles a newly created, deleted, or otherwise changed
 // HTTPScaledObject
-func (r *HTTPScaledObjectReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
-	logger := r.Log.WithValues("HTTPScaledObject.Namespace", req.Namespace, "HTTPScaledObject.Name", req.Name)
+func (rec *HTTPScaledObjectReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
+	logger := rec.Log.WithValues("HTTPScaledObject.Namespace", req.Namespace, "HTTPScaledObject.Name", req.Name)
 
 	ctx := context.Background()
-	_ = r.Log.WithValues("scaledobject", req.NamespacedName)
-	so := &httpv1alpha1.HTTPScaledObject{}
-	if err := r.Client.Get(ctx, client.ObjectKey{
+	_ = rec.Log.WithValues("httpscaledobject", req.NamespacedName)
+	httpso := &httpv1alpha1.HTTPScaledObject{}
+
+	if err := rec.Client.Get(ctx, client.ObjectKey{
 		Name:      req.Name,
 		Namespace: req.Namespace,
-	}, so); err != nil {
+	}, httpso); err != nil {
 		if errors.IsNotFound(err) {
 			// If the HTTPScaledObject wasn't found, it might have
 			// been deleted between the reconcile and the get.
@@ -71,28 +72,27 @@ func (r *HTTPScaledObjectReconciler) Reconcile(req ctrl.Request) (ctrl.Result, e
 		}, err
 	}
 
-	if so.GetDeletionTimestamp() != nil {
+	if httpso.GetDeletionTimestamp() != nil {
 		// if it was marked deleted, delete all the related objects
 		// and don't schedule for another reconcile. Kubernetes
 		// will finalize them
-		removeErr := r.removeAppObjects(logger, req, so)
+		removeErr := rec.removeAppObjects(logger, req, httpso)
 		if removeErr != nil {
 			logger.Error(removeErr, "Removing application objects")
 		}
 		return ctrl.Result{}, removeErr
 	}
 
-	appName := so.Spec.AppName
-	image := so.Spec.Image
-	port := so.Spec.Port
+	appName := httpso.Spec.AppName
+	image := httpso.Spec.Image
+	port := httpso.Spec.Port
 	logger.Info("App Name: %s, image: %s, port: %d", appName, image, port)
 
-	if err := r.addAppObjects(logger, req, so); err != nil {
+	if err := rec.addAppObjects(logger, req, httpso); err != nil {
 		logger.Error(err, "Adding app objects")
-		// TODO: delete app objects that have been created already
+
 		return ctrl.Result{}, err
 	}
-	// TODO: set statuses
 
 	return ctrl.Result{
 		// TODO: add a new spec key to make this time configurable

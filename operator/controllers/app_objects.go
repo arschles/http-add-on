@@ -8,7 +8,7 @@ import (
 	ctrl "sigs.k8s.io/controller-runtime"
 )
 
-func (r *HTTPScaledObjectReconciler) removeAppObjects(
+func (rec *HTTPScaledObjectReconciler) removeAppObjects(
 	logger logr.Logger,
 	req ctrl.Request,
 	so *v1alpha1.HTTPScaledObject,
@@ -17,17 +17,17 @@ func (r *HTTPScaledObjectReconciler) removeAppObjects(
 	return nil
 }
 
-func (r *HTTPScaledObjectReconciler) addAppObjects(
+func (rec *HTTPScaledObjectReconciler) addAppObjects(
 	logger logr.Logger,
 	req ctrl.Request,
-	so *v1alpha1.HTTPScaledObject,
+	httpso *v1alpha1.HTTPScaledObject,
 ) error {
-	logger = r.Log.WithValues()
-	appName := so.Spec.AppName
-	image := so.Spec.Image
-	port := so.Spec.Port
+	logger = rec.Log.WithValues()
+	appName := httpso.Spec.AppName
+	image := httpso.Spec.Image
+	port := httpso.Spec.Port
 
-	appsCl := r.K8sCl.AppsV1().Deployments(req.Namespace)
+	appsCl := rec.K8sCl.AppsV1().Deployments(req.Namespace)
 	deployment := k8s.NewDeployment(req.Namespace, appName, image, port)
 	// TODO: watch the deployment until it reaches ready state
 	if _, err := appsCl.Create(deployment); err != nil {
@@ -35,7 +35,7 @@ func (r *HTTPScaledObjectReconciler) addAppObjects(
 		return err
 	}
 
-	coreCl := r.K8sCl.CoreV1().Services(req.Namespace)
+	coreCl := rec.K8sCl.CoreV1().Services(req.Namespace)
 	service := k8s.NewService(req.Namespace, appName, port)
 	if _, err := coreCl.Create(service); err != nil {
 		logger.Error(err, "Creating service")
@@ -49,10 +49,10 @@ func (r *HTTPScaledObjectReconciler) addAppObjects(
 		req.Namespace,
 		req.Name,
 		req.Name,
-		r.ExternalScalerAddress,
+		rec.ExternalScalerAddress,
 	)
 	// TODO: use r.Client here, not the dynamic one
-	scaledObjectCl := k8s.NewScaledObjectClient(r.K8sDynamicCl)
+	scaledObjectCl := k8s.NewScaledObjectClient(rec.K8sDynamicCl)
 	if _, err := scaledObjectCl.
 		Namespace(req.Namespace).
 		Create(coreScaledObject, metav1.CreateOptions{}); err != nil {
