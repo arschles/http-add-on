@@ -22,7 +22,7 @@ func (r *ScaledObjectReconciler) addAppObjects(
 	req ctrl.Request,
 	so *v1alpha1.ScaledObject,
 ) error {
-	logger := r.Log.WithValues()
+	logger = r.Log.WithValues()
 	appName := so.Spec.AppName
 	image := so.Spec.Image
 	port := so.Spec.Port
