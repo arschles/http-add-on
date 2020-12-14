@@ -95,8 +95,8 @@ func (r *HTTPScaledObjectReconciler) Reconcile(req ctrl.Request) (ctrl.Result, e
 	// TODO: set statuses
 
 	return ctrl.Result{
-		// TODO: should we requeue immediately?
-		RequeueAfter: time.Millisecond * 200,
+		// TODO: add a new spec key to make this time configurable
+		RequeueAfter: time.Millisecond * 50000, // requeue after 50s since these objects will run for a long time
 	}, nil
 }
 
