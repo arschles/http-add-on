@@ -92,11 +92,14 @@ func (rec *HTTPScaledObjectReconciler) Reconcile(req ctrl.Request) (ctrl.Result,
 		logger.Error(err, "Adding app objects")
 
 		return ctrl.Result{}, err
+
+	var pollingInterval int32 = 50000
+	if httpso.Spec.PollingInterval != 0 {
+		pollingInterval = httpso.Spec.PollingInterval
 	}
 
 	return ctrl.Result{
-		// TODO: add a new spec key to make this time configurable
-		RequeueAfter: time.Millisecond * 50000, // requeue after 50s since these objects will run for a long time
+		RequeueAfter: time.Millisecond * time.Duration(pollingInterval),
 	}, nil
 }
 

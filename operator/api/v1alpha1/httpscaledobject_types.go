@@ -44,6 +44,7 @@ type HTTPScaledObjectSpec struct {
 	AppName string `json:"app_name,omitempty"`
 	Image   string `json:"container"`
 	Port    int32  `json:"port"`
+	PollingInterval int32 `json:"polling_interval,omitempty"`
 }
 
 // HTTPScaledObjectStatus defines the observed state of HTTPScaledObject
@@ -51,6 +52,7 @@ type HTTPScaledObjectStatus struct {
 	ServiceStatus    HTTPScaledObjectCreationStatus `json:"service_status,omitempty"`
 	IngressStatus    HTTPScaledObjectCreationStatus `json:"ingress_status,omitempty"`
 	DeploymentStatus HTTPScaledObjectCreationStatus `json:"deployment_status,omitempty"`
+	ScaledObjectStatus HTTPScaledObjectCreationStatus `json:"scaledobject_status,omitempty"`
 	Ready            bool                           `json:"ready,omitempty"`
 }
 
