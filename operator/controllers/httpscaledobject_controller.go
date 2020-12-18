@@ -90,10 +90,10 @@ func (rec *HTTPScaledObjectReconciler) Reconcile(req ctrl.Request) (ctrl.Result,
 	image := httpso.Spec.Image
 	port := httpso.Spec.Port
 	httpso.Status = httpv1alpha1.HTTPScaledObjectStatus{
-		ServiceStatus: httpv1alpha1.Unknown,
-		DeploymentStatus: httpv1alpha1.Unknown,
+		ServiceStatus:      httpv1alpha1.Unknown,
+		DeploymentStatus:   httpv1alpha1.Unknown,
 		ScaledObjectStatus: httpv1alpha1.Unknown,
-		Ready: false,
+		Ready:              false,
 	}
 	logger.Info("App Name: %s, image: %s, port: %d", appName, image, port)
 
@@ -108,8 +108,8 @@ func (rec *HTTPScaledObjectReconciler) Reconcile(req ctrl.Request) (ctrl.Result,
 	if httpso.Status.DeploymentStatus == httpsoapi.Created &&
 		httpso.Status.ScaledObjectStatus == httpsoapi.Created &&
 		httpso.Status.ServiceStatus == httpsoapi.Created {
-			httpso.Status.Ready = true
-		}
+		httpso.Status.Ready = true
+	}
 
 	var pollingInterval int32 = 50000
 	if httpso.Spec.PollingInterval != 0 {

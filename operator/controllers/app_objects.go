@@ -16,10 +16,10 @@ func (rec *HTTPScaledObjectReconciler) removeAppObjects(
 	appName := httpso.Spec.AppName
 	logger = rec.Log.WithValues("reconciler.appObjects", "removeObjects", "HTTPScaledObject.name", appName)
 	httpso.Status = v1alpha1.HTTPScaledObjectStatus{
-		ServiceStatus: v1alpha1.Pending,
-		DeploymentStatus: v1alpha1.Pending,
+		ServiceStatus:      v1alpha1.Pending,
+		DeploymentStatus:   v1alpha1.Pending,
 		ScaledObjectStatus: v1alpha1.Pending,
-		Ready: false,
+		Ready:              false,
 	}
 
 	appsCl := rec.K8sCl.AppsV1().Deployments(req.Namespace)
@@ -59,10 +59,10 @@ func (rec *HTTPScaledObjectReconciler) addAppObjects(
 	image := httpso.Spec.Image
 	port := httpso.Spec.Port
 	httpso.Status = v1alpha1.HTTPScaledObjectStatus{
-		ServiceStatus: v1alpha1.Pending,
-		DeploymentStatus: v1alpha1.Pending,
+		ServiceStatus:      v1alpha1.Pending,
+		DeploymentStatus:   v1alpha1.Pending,
 		ScaledObjectStatus: v1alpha1.Pending,
-		Ready: false,
+		Ready:              false,
 	}
 
 	appsCl := rec.K8sCl.AppsV1().Deployments(req.Namespace)
