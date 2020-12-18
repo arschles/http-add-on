@@ -29,7 +29,7 @@ const (
 	// Created indicates the resource has been created
 	Created HTTPScaledObjectCreationStatus = "Created"
 	// Deleted indicates the resource has been deleted
-	Deleted HTTPScaledObjectCreationStatus = "Deleted"
+	Deleted HTTPScaledObjectCreationStatus = "Created"
 	// Error indicates the resource had an error
 	Error HTTPScaledObjectCreationStatus = "Error"
 	// Pending indicates the resource hasn't been created
@@ -52,7 +52,6 @@ type HTTPScaledObjectSpec struct {
 // HTTPScaledObjectStatus defines the observed state of HTTPScaledObject
 type HTTPScaledObjectStatus struct {
 	ServiceStatus    HTTPScaledObjectCreationStatus `json:"service_status,omitempty"`
-	IngressStatus    HTTPScaledObjectCreationStatus `json:"ingress_status,omitempty"`
 	DeploymentStatus HTTPScaledObjectCreationStatus `json:"deployment_status,omitempty"`
 	ScaledObjectStatus HTTPScaledObjectCreationStatus `json:"scaledobject_status,omitempty"`
 	Ready            bool                           `json:"ready,omitempty"`
