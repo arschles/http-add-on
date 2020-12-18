@@ -28,6 +28,7 @@ import (
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
+	httpsoapi "github.com/kedacore/http-add-on/operator/api/v1alpha1"
 	httpv1alpha1 "github.com/kedacore/http-add-on/operator/api/v1alpha1"
 )
 
@@ -103,6 +104,12 @@ func (rec *HTTPScaledObjectReconciler) Reconcile(req ctrl.Request) (ctrl.Result,
 		}
 		return ctrl.Result{}, err
 	}
+
+	if httpso.Status.DeploymentStatus == httpsoapi.Created &&
+		httpso.Status.ScaledObjectStatus == httpsoapi.Created &&
+		httpso.Status.ServiceStatus == httpsoapi.Created {
+			httpso.Status.Ready = true
+		}
 
 	var pollingInterval int32 = 50000
 	if httpso.Spec.PollingInterval != 0 {
