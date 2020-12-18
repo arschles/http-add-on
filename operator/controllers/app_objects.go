@@ -54,8 +54,8 @@ func (rec *HTTPScaledObjectReconciler) addAppObjects(
 	req ctrl.Request,
 	httpso *v1alpha1.HTTPScaledObject,
 ) error {
-	logger = rec.Log.WithValues()
 	appName := httpso.Spec.AppName
+	logger = rec.Log.WithValues("reconciler.appObjects", "addObjects", "HTTPScaledObject.name", appName)
 	image := httpso.Spec.Image
 	port := httpso.Spec.Port
 	httpso.Status = v1alpha1.HTTPScaledObjectStatus{
