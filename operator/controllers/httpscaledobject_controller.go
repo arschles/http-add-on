@@ -43,9 +43,9 @@ type HTTPScaledObjectReconciler struct {
 }
 
 // +kubebuilder:rbac:groups=http.keda.sh,resources=scaledobjects,verbs=get;list;watch;create;update;patch;delete
-// +kubebuilder:rbac:groups="",resources=pods;services,verbs=get;list;watch;create;update;patch;delete
-// +kubebuilder:rbac:groups=apps,resources=deployments,verbs=get;list;watch;create;update;patch;delete
 // +kubebuilder:rbac:groups=http.keda.sh,resources=scaledobjects/status,verbs=get;update;patch
+// +kubebuilder:rbac:groups="",resources=pods;services,verbs=get;list;watch;create;delete
+// +kubebuilder:rbac:groups=apps,resources=deployments,verbs=get;list;watch;create;delete
 
 // Reconcile reconciles a newly created, deleted, or otherwise changed
 // HTTPScaledObject
