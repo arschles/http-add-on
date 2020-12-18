@@ -28,6 +28,8 @@ type HTTPScaledObjectCreationStatus string
 const (
 	// Created indicates the resource has been created
 	Created HTTPScaledObjectCreationStatus = "Created"
+	// Deleted indicates the resource has been deleted
+	Deleted HTTPScaledObjectCreationStatus = "Deleted"
 	// Error indicates the resource had an error
 	Error HTTPScaledObjectCreationStatus = "Error"
 	// Pending indicates the resource hasn't been created
