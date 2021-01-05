@@ -38,18 +38,15 @@ func main() {
 
 	// TODO: make configurable (obv need to build more)
 	q := http.NewMemoryQueue()
-	e := echo.New()
+	httpServer := echo.New()
 
-	e.Use(middleware.Logger())
-	e.Use(countMiddleware(q)) // adds the request counting middleware
+	httpServer.Use(middleware.Logger())
+	httpServer.Use(countMiddleware(q)) // adds the request counting middleware
 
 	// forwards any request to the destination app after counting
-	e.Any("/*", newForwardingHandler(svcURL))
-
-	adminE := echo.New()
-	adminE.Use(middleware.Logger())
+	httpServer.Any("/*", newForwardingHandler(svcURL))
 
 	port := fmt.Sprintf(":%s", envOr("PROXY_PORT", "8080"))
 	log.Printf("proxy listening on port %s", port)
-	log.Fatal(e.Start(port))
+	log.Fatal(httpServer.Start(port))
 }
