@@ -16,7 +16,7 @@ func init() {
 	rand.Seed(time.Now().UnixNano())
 }
 
-// getSvcURL formats the interceptor service name and port into a URL
+// getSvcURL formats the app service name and port into a URL
 func getSvcURL() (*url.URL, error) {
 	svcName, err := env("KEDA_HTTP_SVC_NAME")
 	if err != nil {
