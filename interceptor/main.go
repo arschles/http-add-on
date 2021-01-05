@@ -16,6 +16,7 @@ func init() {
 	rand.Seed(time.Now().UnixNano())
 }
 
+// getSvcURL formats the interceptor service name and port into a URL
 func getSvcURL() (*url.URL, error) {
 	svcName, err := env("KEDA_HTTP_SVC_NAME")
 	if err != nil {
@@ -27,7 +28,6 @@ func getSvcURL() (*url.URL, error) {
 	}
 	hostPortStr := fmt.Sprintf("http://%s:%s", svcName, svcPort)
 	return url.Parse(hostPortStr)
-
 }
 
 func main() {
@@ -38,12 +38,12 @@ func main() {
 
 	// TODO: make configurable (obv need to build more)
 	q := http.NewMemoryQueue()
-
 	e := echo.New()
 
 	e.Use(middleware.Logger())
-	e.Use(countMiddleware(q))
+	e.Use(countMiddleware(q)) // adds the request counting middleware
 
+	// forwards any request to the destination app after counting
 	e.Any("/*", newForwardingHandler(svcURL))
 
 	adminE := echo.New()
