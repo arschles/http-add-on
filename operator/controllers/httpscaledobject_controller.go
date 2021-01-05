@@ -86,6 +86,7 @@ func (rec *HTTPScaledObjectReconciler) Reconcile(req ctrl.Request) (ctrl.Result,
 		return ctrl.Result{}, removeErr
 	}
 
+	// initializes the required variables and set the initial status to unknown
 	appName := httpso.Spec.AppName
 	image := httpso.Spec.Image
 	port := httpso.Spec.Port
@@ -97,20 +98,29 @@ func (rec *HTTPScaledObjectReconciler) Reconcile(req ctrl.Request) (ctrl.Result,
 	}
 	logger.Info("App Name: %s, image: %s, port: %d", appName, image, port)
 
+	// Create required app objects for the application defined by the CRD
 	if err := rec.addAppObjects(logger, req, httpso); err != nil {
-		logger.Error(err, "Adding app objects")
+		logger.Error(err, "Adding app resources")
 		if removeErr := rec.removeAppObjects(logger, req, httpso); removeErr != nil {
 			logger.Error(removeErr, "Removing previously created resources")
 		}
 		return ctrl.Result{}, err
 	}
 
+	// If all goes well, set the creation status to "Created"
 	if httpso.Status.DeploymentStatus == httpsoapi.Created &&
 		httpso.Status.ScaledObjectStatus == httpsoapi.Created &&
 		httpso.Status.ServiceStatus == httpsoapi.Created {
 		httpso.Status.Ready = true
 	}
 
+	// pollingInterval defines the amount of time the reconciler will wait until
+	// query Kubernetes again to check the status of this CRD.
+	// In short, it will make the HTTPScaledObject more or less responsive according
+	// to how much time this add-on will take to check for changes.
+	// Since HTTPSO's are intended to be representation of user apps, they're not
+	// meant to be something that is deleted and recreated many times, therefore
+	// the default timer is set to 50s, but can be changed using the CRD spec.
 	var pollingInterval int32 = 50000
 	if httpso.Spec.PollingInterval != 0 {
 		pollingInterval = httpso.Spec.PollingInterval
