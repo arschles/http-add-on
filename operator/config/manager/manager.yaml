@@ -29,6 +29,9 @@ spec:
         - --enable-leader-election
         image: controller:latest
         name: manager
+        env:
+          - name: KEDA_HTTP_EXTERNAL_SCALER_ADDR
+            value: ${{ required "The external scaler address must be set" .Values.kedaHttpExternalScalerAddress | quote }}
         resources:
           limits:
             cpu: 100m
