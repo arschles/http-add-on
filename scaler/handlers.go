@@ -1,3 +1,7 @@
+// Handlers contains the gRPC implementation for an external scaler as defined
+// by the KEDA documentation at https://keda.sh/docs/2.0/concepts/external-scalers/#built-in-scalers-interface
+// This is the interface KEDA will poll in order to get the request queue size
+// and scale user apps properly
 package main
 
 import (
