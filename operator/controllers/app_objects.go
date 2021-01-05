@@ -94,6 +94,7 @@ func (rec *HTTPScaledObjectReconciler) addAppObjects(
 		req.Name,
 		rec.ExternalScalerAddress,
 	)
+
 	// TODO: use r.Client here, not the dynamic one
 	scaledObjectCl := k8s.NewScaledObjectClient(rec.K8sDynamicCl)
 	if _, err := scaledObjectCl.
