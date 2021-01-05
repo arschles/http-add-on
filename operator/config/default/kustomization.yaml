@@ -11,6 +11,7 @@ namePrefix: keda-http-addon-
 # Labels to add to all resources and selectors.
 commonLabels:
   keda.sh/addon: keda-http-addon
+  httpscaledobjects.http.keda.sh/version: ${{ .Values.version }}
 
 bases:
 - ../crd
