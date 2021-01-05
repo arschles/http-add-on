@@ -34,18 +34,22 @@ spec:
         spec:
           description: HTTPScaledObjectSpec defines the desired state of HTTPScaledObject
           properties:
-            app_name:
+            app_image:
+              description: The image this application will use.
               type: string
-            container:
+            app_name:
+              description: (optional) The name of the application to be created.
               type: string
             polling_interval:
+              description: (optional) The interval to check for changes.
               format: int32
               type: integer
             port:
+              description: The port this application will serve on.
               format: int32
               type: integer
           required:
-          - container
+          - app_image
           - port
           type: object
         status:

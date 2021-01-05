@@ -43,10 +43,14 @@ const (
 
 // HTTPScaledObjectSpec defines the desired state of HTTPScaledObject
 type HTTPScaledObjectSpec struct {
-	AppName         string `json:"app_name,omitempty"`
-	Image           string `json:"container"`
-	Port            int32  `json:"port"`
-	PollingInterval int32  `json:"polling_interval,omitempty"`
+	// (optional) The name of the application to be created.
+	AppName string `json:"app_name,omitempty"`
+	// The image this application will use.
+	Image string `json:"app_image"`
+	// The port this application will serve on.
+	Port int32 `json:"port"`
+	// (optional) The interval to check for changes.
+	PollingInterval int32 `json:"polling_interval,omitempty"`
 }
 
 // HTTPScaledObjectStatus defines the observed state of HTTPScaledObject
