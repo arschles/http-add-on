@@ -166,5 +166,7 @@ func (rec *HTTPScaledObjectReconciler) createApplicationResources(
 		return err
 	}
 
+	// TODO: Create a new ingress resource that will point to the interceptor
+
 	return nil
 }
