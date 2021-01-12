@@ -64,6 +64,8 @@ func (rec *HTTPScaledObjectReconciler) addAppObjects(
 	userAppPort := httpso.Spec.Port
 	userAppNamespace := httpso.Namespace
 	logger = rec.Log.WithValues("reconciler.appObjects", "addObjects", "HTTPScaledObject.name", userAppName, "HTTPScaledObject.namespace", userAppNamespace)
+
+	// set initial statuses
 	httpso.Status = v1alpha1.HTTPScaledObjectStatus{
 		ServiceStatus:      v1alpha1.Pending,
 		DeploymentStatus:   v1alpha1.Pending,
@@ -72,6 +74,10 @@ func (rec *HTTPScaledObjectReconciler) addAppObjects(
 		ExternalScalerStatus: v1alpha1.Pending,
 		Ready:              false,
 	}
+
+	// Init K8s clients
+	appsCl := rec.K8sCl.AppsV1().Deployments(userAppNamespace)
+	coreCl := rec.K8sCl.CoreV1().Services(userAppNamespace)
 
 	// CREATING THE USER APPLICATION
 	deployment := k8s.NewDeployment(userAppNamespace, userAppName, userAppImage, userAppPort, []v1.EnvVar{})
