@@ -22,7 +22,7 @@ import (
 
 // HTTPScaledObjectCreationStatus describes the creation status
 // of the scaler's additional resources such as Services, Ingresses and Deployments
-// +kubebuilder:validation:Enum=Created;Error;Pending;Unknown
+// +kubebuilder:validation:Enum=Created;Error;Pending;Unknown;Terminating
 type HTTPScaledObjectCreationStatus string
 
 const (
