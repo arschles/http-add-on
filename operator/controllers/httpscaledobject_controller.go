@@ -100,9 +100,9 @@ func (rec *HTTPScaledObjectReconciler) Reconcile(req ctrl.Request) (ctrl.Result,
 	logger.Info("App Name: %s, image: %s, port: %d", appName, image, port)
 
 	// Create required app objects for the application defined by the CRD
-	if err := rec.addAppObjects(logger, req, httpso); err != nil {
+	if err := rec.createApplicationResources(logger, req, httpso); err != nil {
 		logger.Error(err, "Adding app resources")
-		if removeErr := rec.removeAppObjects(logger, req, httpso); removeErr != nil {
+		if removeErr := rec.removeApplicationResources(logger, req, httpso); removeErr != nil {
 			logger.Error(removeErr, "Removing previously created resources")
 		}
 		return ctrl.Result{}, err

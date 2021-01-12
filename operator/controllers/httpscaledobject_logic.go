@@ -38,7 +38,7 @@ type kubernetesClients struct {
 	coreCl typedCorev1.ServiceInterface
 }
 
-func (rec *HTTPScaledObjectReconciler) removeAppObjects(
+func (rec *HTTPScaledObjectReconciler) removeApplicationResources(
 	logger logr.Logger,
 	req ctrl.Request,
 	httpso *v1alpha1.HTTPScaledObject,
@@ -113,7 +113,7 @@ func (rec *HTTPScaledObjectReconciler) removeAppObjects(
 	return nil
 }
 
-func (rec *HTTPScaledObjectReconciler) addAppObjects(
+func (rec *HTTPScaledObjectReconciler) createApplicationResources(
 	logger logr.Logger,
 	req ctrl.Request,
 	httpso *v1alpha1.HTTPScaledObject,
