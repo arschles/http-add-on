@@ -20,7 +20,7 @@ func main() {
 }
 
 func startGrpcServer(port string, q httpQueue) error {
-	lis, err := net.Listen("tcp", fmt.Sprintf("0.0.0.0%s", port))
+	lis, err := net.Listen("tcp", fmt.Sprintf("0.0.0.0:%s", port))
 	if err != nil {
 		log.Fatalf("failed to listen: %v", err)
 	}
