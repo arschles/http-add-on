@@ -118,7 +118,6 @@ func (rec *HTTPScaledObjectReconciler) addAppObjects(
 		userAppNamespace,
 		req.Name,
 		req.Name,
-		rec.ExternalScalerAddress,
 	)
 
 	// TODO: use r.Client here, not the dynamic one

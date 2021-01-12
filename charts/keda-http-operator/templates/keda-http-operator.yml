@@ -329,9 +329,6 @@ spec:
         - --enable-leader-election
         command:
         - /manager
-        env:
-        - name: KEDA_HTTP_EXTERNAL_SCALER_ADDR
-          value: ${{ required "The external scaler address must be set" .Values.kedaHttpExternalScalerAddress | quote }}
         image: keda-http-addon-controller:latest
         name: manager
         resources:

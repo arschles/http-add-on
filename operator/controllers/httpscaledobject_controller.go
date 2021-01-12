@@ -36,7 +36,6 @@ import (
 type HTTPScaledObjectReconciler struct {
 	K8sCl                 *kubernetes.Clientset
 	K8sDynamicCl          dynamic.Interface
-	ExternalScalerAddress string
 	client.Client
 	Log    logr.Logger
 	Scheme *runtime.Scheme
