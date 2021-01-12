@@ -138,11 +138,13 @@ func (rec *HTTPScaledObjectReconciler) addAppObjects(
 	return nil
 }
 
-func createScaledObject (appInfo userApplicationInfo,
+func createScaledObject (
+	appInfo userApplicationInfo,
 	externalScalerAddress string,
 	K8sDynamicCl dynamic.Interface,
 	logger logr.Logger,
-	httpso *v1alpha1.HTTPScaledObject) error {
+	httpso *v1alpha1.HTTPScaledObject,
+) error {
 	coreScaledObject := k8s.NewScaledObject(
 		appInfo.namespace,
 		appInfo.name,
@@ -162,10 +164,12 @@ func createScaledObject (appInfo userApplicationInfo,
 	return nil
 }
 
-func createUserApp (appInfo userApplicationInfo,
+func createUserApp (
+	appInfo userApplicationInfo,
 	clients kubernetesClients,
 	logger logr.Logger,
-	httpso *v1alpha1.HTTPScaledObject) error {
+	httpso *v1alpha1.HTTPScaledObject,
+) error {
 	deployment := k8s.NewDeployment(appInfo.namespace, appInfo.name, appInfo.image, appInfo.port, []corev1.EnvVar{})
 	// TODO: watch the deployment until it reaches ready state
 	// Option: start the creation here and add another method to check if the resources are created
@@ -186,10 +190,12 @@ func createUserApp (appInfo userApplicationInfo,
 	return nil
 }
 
-func createInterceptor (appInfo userApplicationInfo,
-		clients kubernetesClients,
-		logger logr.Logger,
-		httpso *v1alpha1.HTTPScaledObject) (string, error) {
+func createInterceptor (
+	appInfo userApplicationInfo,
+	clients kubernetesClients,
+	logger logr.Logger,
+	httpso *v1alpha1.HTTPScaledObject,
+) (string, error) {
 	interceptorExtendedAppName := appInfo.name + "-interceptor"
 	interceptorEnvs := []corev1.EnvVar{
 		{
@@ -221,10 +227,12 @@ func createInterceptor (appInfo userApplicationInfo,
 	return interceptorExtendedAppName, nil
 }
 
-func createExternalScaler (appInfo userApplicationInfo,
-		clients kubernetesClients,
-		logger logr.Logger,
-		httpso *v1alpha1.HTTPScaledObject) (string, error) {
+func createExternalScaler (
+	appInfo userApplicationInfo,
+	clients kubernetesClients,
+	logger logr.Logger,
+	httpso *v1alpha1.HTTPScaledObject,
+) (string, error) {
 	scalerExtendedAppName := appInfo.name + "-ext-scaler"
 	// NOTE: Scaler port is fixed here because it's a fixed on the scaler main (@see ../scaler/main.go:17)
 	scalerDeployment := k8s.NewDeployment(appInfo.namespace, scalerExtendedAppName, imageRegistry + externalScalerImageName, int32(defaultExposedPort), []corev1.EnvVar{})
