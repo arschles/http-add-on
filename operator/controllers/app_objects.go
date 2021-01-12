@@ -162,7 +162,6 @@ func (rec *HTTPScaledObjectReconciler) addAppObjects(
 	}
 	httpso.Status.InterceptorStatus = v1alpha1.Created
 
-	// TODO: install a dedicated interceptor deployment for this app
 	// TODO: install a dedicated external scaler for this app
 	return nil
 }
