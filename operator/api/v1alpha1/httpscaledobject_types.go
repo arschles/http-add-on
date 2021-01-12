@@ -55,6 +55,7 @@ type HTTPScaledObjectSpec struct {
 	// (optional) The interval to check for changes.
 	PollingInterval int32 `json:"polling_interval,omitempty"`
 }
+// TODO: Add ingress configurations
 
 // HTTPScaledObjectStatus defines the observed state of HTTPScaledObject
 type HTTPScaledObjectStatus struct {
