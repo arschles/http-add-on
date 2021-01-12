@@ -68,6 +68,25 @@ spec:
               - Error
               - Pending
               - Unknown
+              - Terminating
+              type: string
+            externalscaler_status:
+              description: HTTPScaledObjectCreationStatus describes the creation status of the scaler's additional resources such as Services, Ingresses and Deployments
+              enum:
+              - Created
+              - Error
+              - Pending
+              - Unknown
+              - Terminating
+              type: string
+            interceptor_status:
+              description: HTTPScaledObjectCreationStatus describes the creation status of the scaler's additional resources such as Services, Ingresses and Deployments
+              enum:
+              - Created
+              - Error
+              - Pending
+              - Unknown
+              - Terminating
               type: string
             ready:
               type: boolean
@@ -78,6 +97,7 @@ spec:
               - Error
               - Pending
               - Unknown
+              - Terminating
               type: string
             service_status:
               description: HTTPScaledObjectCreationStatus describes the creation status of the scaler's additional resources such as Services, Ingresses and Deployments
@@ -86,6 +106,7 @@ spec:
               - Error
               - Pending
               - Unknown
+              - Terminating
               type: string
           type: object
       type: object
@@ -187,6 +208,16 @@ rules:
   - get
   - patch
   - update
+- apiGroups:
+  - networking
+  resources:
+  - ingresses
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - watch
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
