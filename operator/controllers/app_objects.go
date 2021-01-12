@@ -68,6 +68,8 @@ func (rec *HTTPScaledObjectReconciler) addAppObjects(
 		ServiceStatus:      v1alpha1.Pending,
 		DeploymentStatus:   v1alpha1.Pending,
 		ScaledObjectStatus: v1alpha1.Pending,
+		InterceptorStatus: v1alpha1.Pending,
+		ExternalScalerStatus: v1alpha1.Pending,
 		Ready:              false,
 	}
 
