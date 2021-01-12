@@ -24,6 +24,7 @@ func (rec *HTTPScaledObjectReconciler) removeAppObjects(
 		ExternalScalerStatus: v1alpha1.Terminating,
 		Ready:              false,
 	}
+	logger = rec.Log.WithValues("reconciler.appObjects", "removeObjects", "HTTPScaledObject.name", appName, "HTTPScaledObject.namespace", httpso.Namespace)
 
 	appsCl := rec.K8sCl.AppsV1().Deployments(req.Namespace)
 	if err := appsCl.Delete(appName, &metav1.DeleteOptions{}); err != nil {
@@ -57,10 +58,7 @@ func (rec *HTTPScaledObjectReconciler) addAppObjects(
 	req ctrl.Request,
 	httpso *v1alpha1.HTTPScaledObject,
 ) error {
-	appName := httpso.Spec.AppName
-	logger = rec.Log.WithValues("reconciler.appObjects", "addObjects", "HTTPScaledObject.name", appName)
-	image := httpso.Spec.Image
-	port := httpso.Spec.Port
+	logger = rec.Log.WithValues("reconciler.appObjects", "addObjects", "HTTPScaledObject.name", userAppName, "HTTPScaledObject.namespace", userAppNamespace)
 	httpso.Status = v1alpha1.HTTPScaledObjectStatus{
 		ServiceStatus:      v1alpha1.Pending,
 		DeploymentStatus:   v1alpha1.Pending,
