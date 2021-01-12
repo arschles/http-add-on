@@ -94,6 +94,8 @@ func (rec *HTTPScaledObjectReconciler) Reconcile(req ctrl.Request) (ctrl.Result,
 		ServiceStatus:      httpv1alpha1.Unknown,
 		DeploymentStatus:   httpv1alpha1.Unknown,
 		ScaledObjectStatus: httpv1alpha1.Unknown,
+		ExternalScalerStatus: httpv1alpha1.Unknown,
+		InterceptorStatus: httpv1alpha1.Unknown,
 		Ready:              false,
 	}
 	logger.Info("App Name: %s, image: %s, port: %d", appName, image, port)
@@ -110,6 +112,8 @@ func (rec *HTTPScaledObjectReconciler) Reconcile(req ctrl.Request) (ctrl.Result,
 	// If all goes well, set the creation status to "Created"
 	if httpso.Status.DeploymentStatus == httpsoapi.Created &&
 		httpso.Status.ScaledObjectStatus == httpsoapi.Created &&
+		httpso.Status.InterceptorStatus == httpsoapi.Created &&
+		httpso.Status.ExternalScalerStatus == httpsoapi.Created &&
 		httpso.Status.ServiceStatus == httpsoapi.Created {
 		httpso.Status.Ready = true
 	}
