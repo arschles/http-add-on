@@ -46,7 +46,7 @@ func main() {
 	// forwards any request to the destination app after counting
 	httpServer.Any("/*", newForwardingHandler(svcURL))
 
-	port := fmt.Sprintf(":%s", envOr("PROXY_PORT", "8080"))
+	port := "8080"
 	log.Printf("proxy listening on port %s", port)
 	log.Fatal(httpServer.Start(port))
 }
