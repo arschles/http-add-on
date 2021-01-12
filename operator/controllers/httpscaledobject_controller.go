@@ -78,7 +78,7 @@ func (rec *HTTPScaledObjectReconciler) Reconcile(req ctrl.Request) (ctrl.Result,
 		// if it was marked deleted, delete all the related objects
 		// and don't schedule for another reconcile. Kubernetes
 		// will finalize them
-		removeErr := rec.removeAppObjects(logger, req, httpso)
+		removeErr := rec.removeApplicationResources(logger, req, httpso)
 		if removeErr != nil {
 			logger.Error(removeErr, "Removing application objects")
 		}
