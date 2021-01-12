@@ -161,6 +161,33 @@ func (rec *HTTPScaledObjectReconciler) addAppObjects(
 	}
 	httpso.Status.InterceptorStatus = v1alpha1.Created
 
-	// TODO: install a dedicated external scaler for this app
+	// install a dedicated external scaler for this app
+	interceptorExtendedAppName := userAppName + "-interceptor"
+	interceptorEnvs := []v1.EnvVar{
+		{
+			Name: "KEDA_HTTP_SERVICE_NAME",
+			Value: userAppName,
+		},
+		{
+			Name: "KEDA_HTTP_SERVICE_PORT",
+			Value: strconv.FormatInt(int64(userAppPort), 10),
+		},
+	}
+	// NOTE: Interceptor port is fixed here because it's a fixed on the interceptor main (@see ../interceptor/main.go:49)
+	interceptorDeployment := k8s.NewDeployment(userAppNamespace, interceptorExtendedAppName, imageRegistry + interceptorImageName, 8080, interceptorEnvs)
+	if _, err := appsCl.Create(interceptorDeployment); err != nil {
+		logger.Error(err, "Creating interceptor deployment")
+		httpso.Status.InterceptorStatus = v1alpha1.Error
+		return err
+	}
+
+
+	interceptorService := k8s.NewService(userAppNamespace, interceptorExtendedAppName, 8080)
+	if _, err := coreCl.Create(interceptorService); err != nil {
+		logger.Error(err, "Creating interceptor service")
+		httpso.Status.InterceptorStatus = v1alpha1.Error
+		return err
+	}
+	httpso.Status.InterceptorStatus = v1alpha1.Created
 	return nil
 }

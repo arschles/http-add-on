@@ -8,14 +8,13 @@ import (
 	"fmt"
 	"log"
 	"net"
-	"os"
 
 	externalscaler "github.com/kedacore/http-add-on/scaler/gen"
 	"google.golang.org/grpc"
 )
 
 func main() {
-	portStr := os.Getenv("PORT")
+	portStr := "8080"
 	q := new(reqCounter)
 	log.Fatal(startGrpcServer(portStr, q))
 }
