@@ -58,6 +58,11 @@ func (rec *HTTPScaledObjectReconciler) addAppObjects(
 	req ctrl.Request,
 	httpso *v1alpha1.HTTPScaledObject,
 ) error {
+	// Gather initial data
+	userAppName := httpso.Spec.AppName
+	userAppImage := httpso.Spec.Image
+	userAppPort := httpso.Spec.Port
+	userAppNamespace := httpso.Namespace
 	logger = rec.Log.WithValues("reconciler.appObjects", "addObjects", "HTTPScaledObject.name", userAppName, "HTTPScaledObject.namespace", userAppNamespace)
 	httpso.Status = v1alpha1.HTTPScaledObjectStatus{
 		ServiceStatus:      v1alpha1.Pending,
@@ -66,8 +71,8 @@ func (rec *HTTPScaledObjectReconciler) addAppObjects(
 		Ready:              false,
 	}
 
-	appsCl := rec.K8sCl.AppsV1().Deployments(req.Namespace)
-	deployment := k8s.NewDeployment(req.Namespace, appName, image, port)
+	// CREATING THE USER APPLICATION
+	deployment := k8s.NewDeployment(userAppNamespace, userAppName, userAppImage, userAppPort, []v1.EnvVar{})
 	// TODO: watch the deployment until it reaches ready state
 	// Option: start the creation here and add another method to check if the resources are created
 	if _, err := appsCl.Create(deployment); err != nil {
@@ -77,8 +82,7 @@ func (rec *HTTPScaledObjectReconciler) addAppObjects(
 	}
 	httpso.Status.DeploymentStatus = v1alpha1.Created
 
-	coreCl := rec.K8sCl.CoreV1().Services(req.Namespace)
-	service := k8s.NewService(req.Namespace, appName, port)
+	service := k8s.NewService(userAppNamespace, userAppName, userAppPort)
 	if _, err := coreCl.Create(service); err != nil {
 		logger.Error(err, "Creating service")
 		httpso.Status.ServiceStatus = v1alpha1.Error
@@ -90,7 +94,7 @@ func (rec *HTTPScaledObjectReconciler) addAppObjects(
 	// this needs to be submitted so that KEDA will scale the app's
 	// deployment
 	coreScaledObject := k8s.NewScaledObject(
-		req.Namespace,
+		userAppNamespace,
 		req.Name,
 		req.Name,
 		rec.ExternalScalerAddress,
@@ -99,7 +103,7 @@ func (rec *HTTPScaledObjectReconciler) addAppObjects(
 	// TODO: use r.Client here, not the dynamic one
 	scaledObjectCl := k8s.NewScaledObjectClient(rec.K8sDynamicCl)
 	if _, err := scaledObjectCl.
-		Namespace(req.Namespace).
+		Namespace(userAppNamespace).
 		Create(coreScaledObject, metav1.CreateOptions{}); err != nil {
 		logger.Error(err, "Creating scaledobject")
 		httpso.Status.ScaledObjectStatus = v1alpha1.Error
