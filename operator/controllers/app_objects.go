@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"fmt"
 	"strconv"
 
 	"github.com/go-logr/logr"
@@ -31,6 +32,8 @@ type userApplicationInfo struct {
 	port int32
 	image string
 	namespace string
+	interceptorName string
+	externalScalerName string
 }
 
 type kubernetesClients struct {
@@ -93,6 +96,8 @@ func (rec *HTTPScaledObjectReconciler) addAppObjects(
 		image: httpso.Spec.Image,
 		port: httpso.Spec.Port,
 		namespace: httpso.Namespace,
+		interceptorName: httpso.Spec.AppName + "-interceptor",
+		externalScalerName: httpso.Spec.AppName + "-ext-scaler",
 	}
 	logger = rec.Log.WithValues("reconciler.appObjects", "addObjects", "HTTPScaledObject.name", appInfo.name, "HTTPScaledObject.namespace", appInfo.namespace)
 
@@ -113,34 +118,32 @@ func (rec *HTTPScaledObjectReconciler) addAppObjects(
 	}
 
 	// CREATING THE USER APPLICATION
-	appError := createUserApp(appInfo, k8sClients, logger, httpso)
-	if appError != nil {
-		return appError
+	if err := createUserApp(appInfo, k8sClients, logger, httpso); err != nil {
+		return err
 	}
 
 	// CREATING INTERNAL ADD-ON OBJECTS
 	// Creating the dedicated interceptor
-	_, err := createInterceptor(appInfo, k8sClients, logger, httpso)
-	if err != nil {
+	if err := createInterceptor(appInfo, k8sClients, logger, httpso); err != nil {
 		return err
 	}
 
 	// create dedicated external scaler for this app
-	externalScalerName, err := createExternalScaler(appInfo, k8sClients, logger, httpso)
-	if err != nil {
+	if err := createExternalScaler(appInfo, k8sClients, logger, httpso); err != nil {
 		return err
 	}
 
 	// create the KEDA core ScaledObject (not the HTTP one).
 	// this needs to be submitted so that KEDA will scale the app's deployment
-	createScaledObject(appInfo, externalScalerName, rec.K8sDynamicCl, logger, httpso)
+	if err := createScaledObject(appInfo, rec.K8sDynamicCl, logger, httpso); err != nil {
+		return err
+	}
 
 	return nil
 }
 
 func createScaledObject (
 	appInfo userApplicationInfo,
-	externalScalerAddress string,
 	K8sDynamicCl dynamic.Interface,
 	logger logr.Logger,
 	httpso *v1alpha1.HTTPScaledObject,
@@ -149,7 +152,7 @@ func createScaledObject (
 		appInfo.namespace,
 		appInfo.name,
 		appInfo.name,
-		externalScalerAddress,
+		fmt.Sprintf("%s.%s.svc.cluster.local:%d", appInfo.externalScalerName, appInfo.namespace, defaultExposedPort),
 	)
 	// TODO: use r.Client here, not the dynamic one
 	scaledObjectCl := k8s.NewScaledObjectClient(K8sDynamicCl)
@@ -195,8 +198,7 @@ func createInterceptor (
 	clients kubernetesClients,
 	logger logr.Logger,
 	httpso *v1alpha1.HTTPScaledObject,
-) (string, error) {
-	interceptorExtendedAppName := appInfo.name + "-interceptor"
+) error {
 	interceptorEnvs := []corev1.EnvVar{
 		{
 			Name: "KEDA_HTTP_SERVICE_NAME",
@@ -209,22 +211,22 @@ func createInterceptor (
 	}
 
 	// NOTE: Interceptor port is fixed here because it's a fixed on the interceptor main (@see ../interceptor/main.go:49)
-	interceptorDeployment := k8s.NewDeployment(appInfo.namespace, interceptorExtendedAppName, imageRegistry + interceptorImageName, int32(defaultExposedPort), interceptorEnvs)
+	interceptorDeployment := k8s.NewDeployment(appInfo.namespace, appInfo.interceptorName, imageRegistry + interceptorImageName, int32(defaultExposedPort), interceptorEnvs)
 	if _, err := clients.appsCl.Create(interceptorDeployment); err != nil {
 		logger.Error(err, "Creating interceptor deployment")
 		httpso.Status.InterceptorStatus = v1alpha1.Error
-		return "", err
+		return err
 	}
 
 	// NOTE: Interceptor port is fixed here because it's a fixed on the interceptor main (@see ../interceptor/main.go:49)
-	interceptorService := k8s.NewService(appInfo.namespace, interceptorExtendedAppName, int32(defaultExposedPort))
+	interceptorService := k8s.NewService(appInfo.namespace, appInfo.interceptorName, int32(defaultExposedPort))
 	if _, err := clients.coreCl.Create(interceptorService); err != nil {
 		logger.Error(err, "Creating interceptor service")
 		httpso.Status.InterceptorStatus = v1alpha1.Error
-		return "", err
+		return err
 	}
 	httpso.Status.InterceptorStatus = v1alpha1.Created
-	return interceptorExtendedAppName, nil
+	return nil
 }
 
 func createExternalScaler (
@@ -232,23 +234,22 @@ func createExternalScaler (
 	clients kubernetesClients,
 	logger logr.Logger,
 	httpso *v1alpha1.HTTPScaledObject,
-) (string, error) {
-	scalerExtendedAppName := appInfo.name + "-ext-scaler"
+) error {
 	// NOTE: Scaler port is fixed here because it's a fixed on the scaler main (@see ../scaler/main.go:17)
-	scalerDeployment := k8s.NewDeployment(appInfo.namespace, scalerExtendedAppName, imageRegistry + externalScalerImageName, int32(defaultExposedPort), []corev1.EnvVar{})
+	scalerDeployment := k8s.NewDeployment(appInfo.namespace, appInfo.externalScalerName, imageRegistry + externalScalerImageName, int32(defaultExposedPort), []corev1.EnvVar{})
 	if _, err := clients.appsCl.Create(scalerDeployment); err != nil {
 		logger.Error(err, "Creating scaler deployment")
 		httpso.Status.ExternalScalerStatus = v1alpha1.Error
-		return "", err
+		return err
 	}
 
 	// NOTE: Scaler port is fixed here because it's a fixed on the scaler main (@see ../scaler/main.go:17)
-	scalerService := k8s.NewService(appInfo.namespace, scalerExtendedAppName, int32(defaultExposedPort))
+	scalerService := k8s.NewService(appInfo.namespace, appInfo.externalScalerName, int32(defaultExposedPort))
 	if _, err := clients.coreCl.Create(scalerService); err != nil {
 		logger.Error(err, "Creating scaler service")
 		httpso.Status.ExternalScalerStatus = v1alpha1.Error
-		return "", err
+		return err
 	}
 	httpso.Status.ExternalScalerStatus = v1alpha1.Created
-	return scalerExtendedAppName, nil
+	return nil
 }
