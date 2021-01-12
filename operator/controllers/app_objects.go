@@ -1,11 +1,24 @@
 package controllers
 
 import (
+	"strconv"
+
 	"github.com/go-logr/logr"
 	"github.com/kedacore/http-add-on/operator/api/v1alpha1"
 	"github.com/kedacore/http-add-on/pkg/k8s"
+	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	ctrl "sigs.k8s.io/controller-runtime"
+)
+
+const (
+	// The image registry to be used to download KEDA assets, it'll
+	// be concatenated with the image names
+	imageRegistry string = "khaosdoctor/"
+	// Image name for the interceptor container
+	interceptorImageName string = "keda-http-interceptor"
+	// Image name for the external scaler container
+	externalScalerImageName string = "keda-http-external-scaler"
 )
 
 func (rec *HTTPScaledObjectReconciler) removeAppObjects(
@@ -119,7 +132,35 @@ func (rec *HTTPScaledObjectReconciler) addAppObjects(
 	}
 	httpso.Status.ScaledObjectStatus = v1alpha1.Created
 
-	return nil
+	// CREATING INTERNAL ADD-ON OBJECTS
+	// Creating the dedicated interceptor
+	interceptorExtendedAppName := userAppName + "-interceptor"
+	interceptorEnvs := []v1.EnvVar{
+		{
+			Name: "KEDA_HTTP_SERVICE_NAME",
+			Value: userAppName,
+		},
+		{
+			Name: "KEDA_HTTP_SERVICE_PORT",
+			Value: strconv.FormatInt(int64(userAppPort), 10),
+		},
+	}
+	// NOTE: Interceptor port is fixed here because it's a fixed on the interceptor main (@see ../interceptor/main.go:49)
+	interceptorDeployment := k8s.NewDeployment(userAppNamespace, interceptorExtendedAppName, imageRegistry + interceptorImageName, 8080, interceptorEnvs)
+	if _, err := appsCl.Create(interceptorDeployment); err != nil {
+		logger.Error(err, "Creating interceptor deployment")
+		httpso.Status.InterceptorStatus = v1alpha1.Error
+		return err
+	}
+
+
+	interceptorService := k8s.NewService(userAppNamespace, interceptorExtendedAppName, 8080)
+	if _, err := coreCl.Create(interceptorService); err != nil {
+		logger.Error(err, "Creating interceptor service")
+		httpso.Status.InterceptorStatus = v1alpha1.Error
+		return err
+	}
+	httpso.Status.InterceptorStatus = v1alpha1.Created
 
 	// TODO: install a dedicated interceptor deployment for this app
 	// TODO: install a dedicated external scaler for this app
