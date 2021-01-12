@@ -14,11 +14,14 @@ func (rec *HTTPScaledObjectReconciler) removeAppObjects(
 	httpso *v1alpha1.HTTPScaledObject,
 ) error {
 	appName := httpso.Spec.AppName
-	logger = rec.Log.WithValues("reconciler.appObjects", "removeObjects", "HTTPScaledObject.name", appName)
+
+	// set initial statuses
 	httpso.Status = v1alpha1.HTTPScaledObjectStatus{
-		ServiceStatus:      v1alpha1.Pending,
-		DeploymentStatus:   v1alpha1.Pending,
-		ScaledObjectStatus: v1alpha1.Pending,
+		ServiceStatus:      v1alpha1.Terminating,
+		DeploymentStatus:   v1alpha1.Terminating,
+		ScaledObjectStatus: v1alpha1.Terminating,
+		InterceptorStatus: v1alpha1.Terminating,
+		ExternalScalerStatus: v1alpha1.Terminating,
 		Ready:              false,
 	}
 

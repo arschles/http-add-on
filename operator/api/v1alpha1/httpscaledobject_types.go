@@ -34,6 +34,9 @@ const (
 	Error HTTPScaledObjectCreationStatus = "Error"
 	// Pending indicates the resource hasn't been created
 	Pending HTTPScaledObjectCreationStatus = "Pending"
+	// Terminating indicates that the resource is marked for deletion but hasn't
+	// been deleted yet
+	Terminating HTTPScaledObjectCreationStatus = "Terminating"
 	// Unknown indicates the status is unavailable
 	Unknown HTTPScaledObjectCreationStatus = "Unknown"
 )
@@ -58,6 +61,8 @@ type HTTPScaledObjectStatus struct {
 	ServiceStatus      HTTPScaledObjectCreationStatus `json:"service_status,omitempty"`
 	DeploymentStatus   HTTPScaledObjectCreationStatus `json:"deployment_status,omitempty"`
 	ScaledObjectStatus HTTPScaledObjectCreationStatus `json:"scaledobject_status,omitempty"`
+	InterceptorStatus HTTPScaledObjectCreationStatus `json:"interceptor_status,omitempty"`
+	ExternalScalerStatus HTTPScaledObjectCreationStatus `json:"externalscaler_status,omitempty"`
 	Ready              bool                           `json:"ready,omitempty"`
 }
 
