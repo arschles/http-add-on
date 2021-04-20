@@ -3,6 +3,7 @@ package net
 import (
 	"context"
 	"fmt"
+	"log"
 	"net"
 	stdnet "net"
 	"time"
@@ -39,6 +40,7 @@ func DialContextWithRetry(coreDialer *net.Dialer, backoff wait.Backoff) DialCont
 		for i := 0; i < numDialTries; i++ {
 			conn, err := coreDialer.DialContext(ctx, network, addr)
 			if err == nil {
+				log.Printf("Dialed, continuing")
 				return conn, nil
 			}
 			lastError = err
@@ -46,9 +48,11 @@ func DialContextWithRetry(coreDialer *net.Dialer, backoff wait.Backoff) DialCont
 			t := time.NewTimer(sleepDur)
 			select {
 			case <-ctx.Done():
+				log.Printf("Error: context timed out with error %s, bailing", ctx.Err())
 				t.Stop()
 				return nil, fmt.Errorf("context timed out: %s", ctx.Err())
 			case <-t.C:
+				log.Printf("Stopping timer")
 				t.Stop()
 			}
 		}

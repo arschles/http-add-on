@@ -20,16 +20,21 @@ func newDeployReplicasForwardWaitFunc(
 		deployment, err := deployCache.Get(deployName)
 		if err != nil {
 			// if we didn't get the initial deployment state, bail out
-			return fmt.Errorf("Error getting state for deployment %s (%s)", deployName, err)
+			return fmt.Errorf("error getting state for deployment %s (%s)", deployName, err)
 		}
 		// if there is 1 or more replica, we're done waiting
 		if moreThanPtr(deployment.Spec.Replicas, 0) {
+			log.Printf(
+				"%d replicas found for deployment %s, moving on",
+				*deployment.Spec.Replicas,
+				deployName,
+			)
 			return nil
 		}
 
 		watcher := deployCache.Watch(deployName)
 		if err != nil {
-			return fmt.Errorf("Error getting the stream of deployment changes")
+			return fmt.Errorf("error getting the stream of deployment changes")
 		}
 		defer watcher.Stop()
 		eventCh := watcher.ResultChan()
@@ -47,11 +52,12 @@ func newDeployReplicasForwardWaitFunc(
 					)
 				}
 				if moreThanPtr(deployment.Spec.Replicas, 0) {
+					log.Printf("Found %d replicas, done waiting", *deployment.Spec.Replicas)
 					return nil
 				}
 			case <-timer.C:
 				// otherwise, if we hit the end of the timeout, fail
-				return fmt.Errorf("Timeout expired waiting for deployment %s to reach > 0 replicas", deployName)
+				return fmt.Errorf("timeout expired waiting for deployment %s to reach > 0 replicas", deployName)
 			}
 		}
 	}
