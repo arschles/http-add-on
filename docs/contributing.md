@@ -72,4 +72,4 @@ Some of the above commands require several environment variables to be set. You 
 - `KEDAHTTP_OPERATOR_IMAGE`: the fully qualified name of the [operator](../operator) image. This is used to build, push, and install the operator into a Kubernetes cluster (required)
 - `KEDAHTTP_NAMESPACE`: the Kubernetes namespace to which to install the add on and other required components (optional, defaults to `kedahttp`)
 
->Suffic any `*_IMAGE` variable with `${GIT_SHA}` and the build system will automatically replace it with `sha-$(git rev-parse --short HEAD)`
+>Suffic any `*_IMAGE` variable with `<keda-git-sha>` and the build system will automatically replace it with `sha-$(git rev-parse --short HEAD)`

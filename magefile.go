@@ -53,7 +53,7 @@ func (Scaler) Test(ctx context.Context) error {
 }
 
 func (Scaler) DockerBuild(ctx context.Context) error {
-	img, err := env.Get(SCALER_IMAGE_ENV_VAR)
+	img, err := build.GetImageName(SCALER_IMAGE_ENV_VAR)
 	if err != nil {
 		return err
 	}
@@ -61,7 +61,7 @@ func (Scaler) DockerBuild(ctx context.Context) error {
 }
 
 func (Scaler) DockerPush(ctx context.Context) error {
-	image, err := env.Get(SCALER_IMAGE_ENV_VAR)
+	image, err := build.GetImageName(SCALER_IMAGE_ENV_VAR)
 	if err != nil {
 		return err
 	}
@@ -96,7 +96,7 @@ func (Operator) Test(ctx context.Context) error {
 }
 
 func (Operator) DockerBuild(ctx context.Context) error {
-	img, err := env.Get(OPERATOR_IMAGE_ENV_VAR)
+	img, err := build.GetImageName(OPERATOR_IMAGE_ENV_VAR)
 	if err != nil {
 		return err
 	}
@@ -104,7 +104,7 @@ func (Operator) DockerBuild(ctx context.Context) error {
 }
 
 func (Operator) DockerPush(ctx context.Context) error {
-	image, err := env.Get(OPERATOR_IMAGE_ENV_VAR)
+	image, err := build.GetImageName(OPERATOR_IMAGE_ENV_VAR)
 	if err != nil {
 		return err
 	}
@@ -142,7 +142,7 @@ func (Interceptor) Test(ctx context.Context) error {
 // KEDAHTTP_INTERCEPTOR_IMAGE environment variable to get the interceptor image
 // name. It fails otherwise
 func (Interceptor) DockerBuild(ctx context.Context) error {
-	image, err := env.Get(INTERCEPTOR_IMAGE_ENV_VAR)
+	image, err := build.GetImageName(INTERCEPTOR_IMAGE_ENV_VAR)
 	if err != nil {
 		return err
 	}
@@ -150,7 +150,7 @@ func (Interceptor) DockerBuild(ctx context.Context) error {
 }
 
 func (Interceptor) DockerPush(ctx context.Context) error {
-	image, err := env.Get(INTERCEPTOR_IMAGE_ENV_VAR)
+	image, err := build.GetImageName(INTERCEPTOR_IMAGE_ENV_VAR)
 	if err != nil {
 		return err
 	}

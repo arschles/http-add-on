@@ -8,6 +8,10 @@ import (
 	"github.com/magefile/mage/sh"
 )
 
+const (
+	gitShaSuffix = "<keda-git-sha>"
+)
+
 func getGitSHA() (string, error) {
 	return sh.Output("git", "rev-parse", "--short", "HEAD")
 }
@@ -39,13 +43,14 @@ func GetImageName(envName string) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	if strings.HasSuffix(img, "${GIT_SHA}") {
+	if strings.HasSuffix(img, gitShaSuffix) {
 		sha, err := getGitSHA()
 		if err != nil {
 			return "", err
 		}
-		trimmed := strings.TrimRight(img, "${GIT_SHA}")
-		return fmt.Sprintf("%s:sha-%s", trimmed, sha), nil
+		fmt.Println("using sha ", sha)
+		trimmed := strings.TrimSuffix(img, gitShaSuffix)
+		img = fmt.Sprintf("%ssha-%s", trimmed, sha)
 	}
 	return img, nil
 }
