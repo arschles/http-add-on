@@ -51,7 +51,7 @@ func getSlash(repository string) string {
 	return "/"
 }
 
-func getFullImageName(repository string, module string) string {
+func getFullImageName(repository, module string) string {
 	return fmt.Sprintf(
 		"%s%s%s-%v:%s",
 		repository,
